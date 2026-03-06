@@ -1,15 +1,35 @@
 <?php
 require 'connect.php';
 
-$sql_select = "select * from country order by CountryCode";
+$sql_select = "SELECT * FROM country ORDER BY CountryCode";
 $stmt_s = $conn->prepare($sql_select);
 $stmt_s->execute();
 
 if (isset($_POST['submit'])) {
 
     if (!empty($_POST['CustomerID']) && !empty($_POST['Name'])) {
-        $sql = "INSERT INTO customer (CustomerID, Name, Birthdate, Email, CountryCode, OutstandingDebt) 
-        VALUES (:CustomerID, :Name, :Birthdate, :Email, :CountryCode, :OutstandingDebt)";
+
+        $sql = "INSERT INTO customer 
+        (CustomerID, Name, Birthdate, Email, CountryCode, OutstandingDebt)
+        VALUES 
+        (:CustomerID, :Name, :Birthdate, :Email, :CountryCode, :OutstandingDebt)";
+
+        $stmt = $conn->prepare($sql);
+
+        $stmt->bindParam(':CustomerID', $_POST['CustomerID']);
+        $stmt->bindParam(':Name', $_POST['Name']);
+        $stmt->bindParam(':Birthdate', $_POST['Birthdate']);
+        $stmt->bindParam(':Email', $_POST['Email']);
+        $stmt->bindParam(':CountryCode', $_POST['CountryCode']);
+        $stmt->bindParam(':OutstandingDebt', $_POST['OutstandingDebt']);
+
+        $result = $stmt->execute();
+
+        if ($result) {
+            echo "Insert success";
+        } else {
+            echo "Insert failed";
+        }
     }
 }
 ?>
@@ -22,7 +42,7 @@ if (isset($_POST['submit'])) {
 
 <body>
     <h1>Add customer but not in order of columns</h1>
-    <form action="addcustomer_dropdownfull" method="POST">
+    <form action="addcustomer_dropdownfull.php" method="POST">
 
         <label for="CustomerID">Customer ID :</label><br>
         <input type="text" placeholder="Enter Customer ID" name="CustomerID">
